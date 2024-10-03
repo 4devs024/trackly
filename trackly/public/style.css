@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+
+    body::-webkit-scrollbar {
+        display: none; /* Safari and Chrome */
+    }
+
+    list-style: none;
+    text-decoration: none;
+
+    font-family: 'Poppins', sans-serif;
+
+    a:link {
+        text-decoration: none;
+    }
+    
+    a:visited {
+        text-decoration: none;
+    }
+    
+    a:hover {
+        text-decoration: none;
+    }
+    
+    a:active {
+        text-decoration: none;
+        color: inherit;
+    }
+}
+
+.gm-fullscreen-control {
+    display: none !important; /* Hide the fullscreen control */
+  }
+
+:root{
+    --first-color: #e8e8e8;
+    --second-color: #B1B2B9;
+    --third-color:  #B9B1B2;
+    --fourth-color: #B2B9B1;
+    --fifth-color: #181818;
+    --sixth-color: #818181;
+    --success-light: #4BB543;
+    --success-dark: #006400;
+    --error-light: #FFB6C1;
+    --error-dark: #8B0000;
+    --blue-light: #4285F4;
+    --blue-dark: #174EA6;
+    --yello-light: #FBBC05;
+    --yello-dark: #F4B400;
+    --red-light: #EA4335;
+    --red-dark: #C5221F;
+}
+
+button, input[type="button"], input[type="submit"] {
+    /* Remove margins and padding */
+    margin: 0;
+    padding: 0;
+
+    /* Remove borders */
+    border: none;
+
+    /* Remove background */
+    background: none;
+
+    /* Remove outline (for when the button is focused) */
+    outline: none;
+
+    /* Reset font properties */
+    font: inherit; /* Inherits font properties from its parent */
+
+    /* Reset text properties */
+    color: inherit; /* Inherits text color from its parent */
+    text-align: inherit; /* Inherits text alignment from its parent */
+
+    /* Optional: Reset display properties */
+    display: inline-block; /* Ensures buttons behave like inline elements but retain block-level box properties */
+    line-height: normal; /* Ensures the line height is normal */
+
+    /* Optional: Reset cursor */
+    cursor: pointer; /* Ensures it still shows the pointer cursor */
+}
+
+/* Optionally, you might want to add specific styles for the button in different states (hover, active, etc.) */
+button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+    /* Custom hover styles */
+}
+button:active, input[type="button"]:active, input[type="submit"]:active {
+    /* Custom active styles */
+}
+button:focus, input[type="button"]:focus, input[type="submit"]:focus {
+    /* Custom focus styles */
+    outline: none; /* Ensure the focus outline is removed */
+}

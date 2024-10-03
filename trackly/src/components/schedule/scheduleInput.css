@@ -1,0 +1,140 @@
+.schedule-container {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 20px;
+  margin: 20px auto;
+  color: #000;
+  text-align: center;
+}
+
+.schedule-container .schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.schedule-container .schedule-table th,
+.schedule-container .schedule-table td {
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.schedule-container .schedule-table th {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.schedule-container .schedule-table td input {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #000;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.schedule-container .add-entry-button,
+.schedule-container .submit-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #000;
+  padding: 10px 20px;
+  margin: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.schedule-container .add-entry-button:hover,
+.schedule-container .submit-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+
+
+/* .schedule-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.schedule-form .schedule-day {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1rem 0;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3); 
+}
+
+.schedule-form .schedule-day h3 {
+  margin-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3); 
+  padding-bottom: 0.5rem;
+}
+
+.schedule-form .schedule-entry {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.schedule-form .schedule-entry label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.schedule-form .schedule-entry input {
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.schedule-form button[type="submit"] {
+  padding: 0.75rem 1.5rem;
+  border-radius: 5px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.schedule-form button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+.schedule-form .add-entry-button{
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.schedule-form .add-entry-button:hover{
+  background-color: #45a049;
+}
+
+.schedule-form .remove-entry-button{
+  
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: none;
+  background-color: rgb(255, 97, 97);
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.schedule-form .remove-entry-button:hover{
+  background-color: red;
+} */

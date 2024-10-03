@@ -1,0 +1,52 @@
+@keyframes popup {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.popup-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    z-index: 1000;
+    height: 90vh;
+    width: 90vw;
+    overflow: scroll;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0); /* Semi-transparent black */
+    backdrop-filter: blur(10px); /* Blur effect */
+    animation: popup 0.3s ease-out;
+    &::-webkit-scrollbar {
+      width: 0;
+  }
+    
+  }
+  
+  .popup-container .popup-content {
+    background: transparent;
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+    /* max-width: 500px; */
+    width: 100%;
+  }
+  
+  .popup-container .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+
+  

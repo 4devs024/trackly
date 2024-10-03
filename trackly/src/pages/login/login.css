@@ -1,0 +1,213 @@
+/* .login-container{
+    height: 100vh;
+    width: 100vw;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.login-container .login-container-inner{
+    height: 72vh;
+    width: 72vw;
+    display: flex;
+    flex-direction: row;
+}
+
+.login-container .login-container-inner .logo-container{
+    flex: 0.5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--first-color);
+    border-top-left-radius: 24px;
+    border-bottom-left-radius: 24px;
+}
+
+.login-container .login-container-inner .logo-container img{
+    height: 136px;
+}
+
+.login-container .login-container-inner .login-content{
+    border-top-right-radius: 24px;
+    border-bottom-right-radius: 24px;
+    flex: 0.5;
+    
+    background-color: var(--third-color);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.login-container .login-container-inner .login-content .button-container{
+    flex: 0.1;
+    width: 100%;
+}
+
+
+.login-container .login-container-inner .login-content .button-container .login-items{
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.login-container .login-container-inner .login-content .button-container .login-items li{
+    display: grid;
+    grid-template-columns: 40px auto;
+    align-items: center;
+    margin: .6rem 0;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .4s ease-in-out;
+    padding-left: 1rem;
+    position: relative;
+}
+.active{
+    color: var(--first-color);
+    #i{
+        color: #DB4948;
+    }
+    &::before{
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--first-color);
+        border-radius: 0 10px 10px 0;
+    }
+}
+.login-container .login-container-inner .login-content .horizontal-line{
+    background-color: var(--first-color);
+    height: 2px;
+    width: 90%;
+    border-radius: 8px;
+    
+}
+
+.login-container .login-container-inner .login-content .form-container{
+    flex: 0.9;
+    width: 100%;
+}
+ */
+
+
+ .login-container{
+    height: 100vh;
+    width: 100vw;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.login-container .login-container-inner{
+    height: 72vh;
+    width: 72vw;
+    display: flex;
+    flex-direction: row;
+}
+
+.login-container .login-container-inner .logo-container{
+    flex: 0.5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--first-color);
+    border-top-left-radius: 24px;
+    border-bottom-left-radius: 24px;
+}
+
+.login-container .login-container-inner .logo-container img{
+    height: 136px;
+}
+
+.login-container .login-container-inner .login-content{
+    border-top-right-radius: 24px;
+    border-bottom-right-radius: 24px;
+    flex: 0.5;
+    
+    background-color: var(--third-color);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.login-container .login-container-inner .login-content .horizontal-line{
+    background-color: var(--first-color);
+    height: 2px;
+    width: 90%;
+    border-radius: 8px;
+    
+}
+
+.login-container .login-container-inner .login-content .form-container{
+    flex: 0.9;
+    width: 100%;
+}
+
+/* -----------------------*/
+
+.login-container .login-container-inner .login-content .form-container .login-form{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    flex: 0.75;
+}
+
+.login-container .login-container-inner .login-content .form-container .login-form .input-control{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.login-container .login-container-inner .login-content .form-container .login-form .input-control input{
+    
+    font-family: inherit;
+    font-size: inherit;
+    outline: none;
+
+    width: 88%;
+    box-sizing: border-box;
+
+    padding: 1px 2px;
+    border-radius: 5px;
+    color: black;
+    background: transparent;
+    resize: none;
+    box-shadow: 0 1px 15px rgba(0, 0, 0, 0.06);
+    color: rgba(34, 34, 96, 0.9);
+    &::placeholder{
+        color: rgba(34, 34, 96, 0.4);
+    }
+}
+
+.login-container .login-container-inner .login-content .horizontal-line{
+    background-color: var(--first-color);
+    height: 2px;
+    width: 90%;
+    border-radius: 8px;
+    
+}
+
+.passenger-container .login-container-inner .login-content .bottom-container{
+    flex: 0.2;
+}
+
+.login-container .login-container-inner .login-content  .bottom-container .social-media{
+    display: grid;
+    grid-template-columns: 40px auto;
+    padding: 0.2rem 4rem;
+    margin-top: 4px;
+}
