@@ -1,16 +1,17 @@
 import styled from "styled-components"
 import { useState } from "react";
 
-import { useAddBusContext } from "../../../contexts/driver/AddBusContext";
+import { useAddBusContext } from "../../../../contexts/driver/AddBusContext";
 
-import Button from '../../button/Button'
+import Button from '../../../button/Button'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck, faCircleChevronLeft, faRoute, faCalendarDays } from "@fortawesome/free-solid-svg-icons";
 
-import Popup from "../../popup/Popup";
-import DriverRouteSelect from "../../map/driver-schedule-select-map/DriverRouteSelect";
-import ScheduleInput from "../../schedule/ScheduleInput";
+import Popup from "../../../popup/Popup";
+import ScheduleInput from "../../../schedule/ScheduleInput";
+import SelectBusRouteForm from "./sub-form/select-route-form/SelectBusRouteForm";
+
 
 
 
@@ -23,28 +24,28 @@ const AddBusFormThree = () => {
     const [arrival, setArrival] = useState(null);
   
     const handleOpenPopup = (e) => {
-      e.preventDefault(); // Prevent form submission
       setIsPopupOpen(true);
     };
   
-    const handleAddRouteClick = () => {
-      setIsPopupOpen(true);
-      setIsMapVisible(true);
+    const handleAddRouteClick = (e) => {
+        setIsPopupOpen(true);
+        setIsMapVisible(true);
     };
   
-    const handleClosePopup = () => {
-      setIsPopupOpen(false);
-      setIsMapVisible(false);
+    const handleClosePopup = (e) => {
+        setIsPopupOpen(false);
+        setIsMapVisible(false);
     };
 
 
     const {
-        formData,
         prevStep,
-        handleChange
+        handleSubmit,
+        endPlaces
     } = useAddBusContext();
 
     const handleMapClick = (e) => {
+        e.preventDefault();
         if (!departure) {
           setDeparture({ lat: e.latLng.lat(), lng: e.latLng.lng() });
         } else if (!arrival) {
@@ -56,14 +57,10 @@ const AddBusFormThree = () => {
       };
   
   
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      // Handle form submission logic
-    };
 
 
     return(
-        <AddBusFormThreeStyled onSubmit={handleSubmit}>
+        <AddBusFormThreeStyled>
             <div className="upper-layer">
                 <h2>Route details</h2>
                 <hr />
@@ -123,7 +120,7 @@ const AddBusFormThree = () => {
                         />
                     </div>
                     <Popup isOpen={isPopupOpen} onClose={handleClosePopup}>
-                        {isMapVisible ? <DriverRouteSelect onClick={handleMapClick} departure={departure} arrival={arrival} /> : <ScheduleInput />}
+                        {isMapVisible ? <SelectBusRouteForm onClick={handleMapClick} departure={departure} arrival={arrival} /> : <ScheduleInput />}
                     </Popup>
 
                 </div>
@@ -132,7 +129,7 @@ const AddBusFormThree = () => {
     )
 }
 
-const AddBusFormThreeStyled = styled.form`
+const AddBusFormThreeStyled = styled.div`
 
     display: flex;
     flex-direction: column;

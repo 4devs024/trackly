@@ -1,10 +1,13 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from "react";
 
+import { useAddBusContext } from "../driver/AddBusContext";
+
 const LocationSearchContext = createContext();
 
 export const useLocationSearchContext = () => useContext(LocationSearchContext);
 
 export const LocationSearchProvider = ({ children }) => {
+
   const [map, setMap] = useState(null);
   const [autocompleteStart, setAutocompleteStart] = useState(null);
   const [autocompleteEnd, setAutocompleteEnd] = useState(null);
@@ -16,6 +19,8 @@ export const LocationSearchProvider = ({ children }) => {
   const [placePhoto, setPlacePhoto] = useState(null); // New state for place photo
   const [startPositionName, setStartPositionName ] = useState('');
   const [endPositionName, setEndPositionName] = useState('');
+
+  
 
   const [autocompleteValue, setAutocompleteValue ] = useState(null);
 
@@ -35,6 +40,8 @@ export const LocationSearchProvider = ({ children }) => {
       setEndPosition(null);
     }
   }, [endPositionName]);
+
+
 
   useEffect(() => {
     if (!directionsService.current && window.google) {
@@ -92,7 +99,7 @@ export const LocationSearchProvider = ({ children }) => {
         setPosition({ lat: location.lat(), lng: location.lng() });
 
         // This is used to set the autocompleted value on the input field.
-        const name = place.formatted_address || place.name || '';
+        const name = place.name || place.formatted_address || '';
         setPositionName(name);
         if (map) {
           map.panTo(location);
@@ -131,19 +138,20 @@ export const LocationSearchProvider = ({ children }) => {
       if (!directionsService.current) {
         directionsService.current = new window.google.maps.DirectionsService();
       }
-
+  
       const waypointsObj = waypoints.map((point) => ({
         location: new window.google.maps.LatLng(point.lat, point.lng),
-        stopover: true,
+        stopover: true, // Mark as stopover so the route will pass through these points
       }));
-
+  
       directionsService.current.route(
         {
           origin: startPosition,
           destination: endPosition,
           waypoints: waypointsObj,
           travelMode: window.google.maps.TravelMode.DRIVING,
-          provideRouteAlternatives: true,
+          provideRouteAlternatives: true, // Enable multiple route options
+          optimizeWaypoints: false, // Prevent optimization so the route must go through waypoints
           avoidFerries: true,
           avoidTolls: true,
         },
@@ -152,13 +160,15 @@ export const LocationSearchProvider = ({ children }) => {
             setDirections(result);
             setSelectedRouteIndex(null); // Reset selected route index
           } else {
-            console.error(`Error fetching directions ${result}`);
+            console.error(`Error fetching directions: ${status}`);
           }
         }
       );
+    } else {
+      console.log("Start and end positions must be set before calculating route.");
     }
   };
-
+  
 
 
   return (
@@ -185,7 +195,15 @@ export const LocationSearchProvider = ({ children }) => {
       setGPSError,
       setUserLocation,
       gpsLocation,
-      directionsService
+      directionsService,
+      setWaypoints,
+      waypoints,
+      directions,
+      addWaypoint,
+      removeWaypoint,
+      calculateRoute,
+      selectedRouteIndex,
+      setSelectedRouteIndex
       
     }}>
       {children}

@@ -1,0 +1,1 @@
+export const busServerUrl = "http://localhost:9091/buses";

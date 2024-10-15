@@ -1,9 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 
-function Button({ name, icon, onClick, bgColor, bPad, color, bRad, width, hoverColor, hoverBgColor, height }) {
+function Button({ name, icon, onClick, bgColor, bPad, color, bRad, width, hoverColor, hoverBgColor, height, type }) {
     return (
         <ButtonStyled
+            type={type}
             onClick={onClick}
             $bgcol={bgColor}
             $bpad={bPad}

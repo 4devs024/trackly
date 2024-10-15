@@ -1,8 +1,8 @@
 import styled from "styled-components"
 
-import { useAddBusContext } from "../../../contexts/driver/AddBusContext";
+import { useAddBusContext } from "../../../../contexts/driver/AddBusContext";
 
-import Button from '../../button/Button'
+import Button from '../../../button/Button'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleChevronRight, faCircleChevronLeft } from "@fortawesome/free-solid-svg-icons";
@@ -13,7 +13,13 @@ const AddBusFormOne = () => {
     const {
         formData,
         handleChange,
-        nextStep
+        nextStep,
+        firstName, 
+        setFirstName,
+        lastName,
+        setLastName,
+        phoneNumber,
+        setPhoneNumber
     } = useAddBusContext();
 
     return(
@@ -32,8 +38,8 @@ const AddBusFormOne = () => {
                                 type="text"
                                 name="firstName"
                                 placeholder="First name"
-                                value={formData.lastName}
-                                onChange={handleChange}
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
                             />
                         </label>
                     </div>
@@ -44,8 +50,8 @@ const AddBusFormOne = () => {
                                 type="text"
                                 name="secondName"
                                 placeholder="Second name"
-                                value={formData.lastName}
-                                onChange={handleChange}
+                                value={lastName}
+                                onChange={e => setLastName(e.target.value)}
                             />
                         </label>
                     </div>
@@ -56,8 +62,8 @@ const AddBusFormOne = () => {
                                 type="tel"
                                 name="phoneNumber"
                                 placeholder="Phone Number"
-                                value={formData.lastName}
-                                onChange={handleChange}
+                                value={phoneNumber}
+                                onChange={e => setPhoneNumber(e.target.value)}
                             />
                         </label>
                     </div>
@@ -80,7 +86,7 @@ const AddBusFormOne = () => {
     )
 }
 
-const AddBusFormOneStyled = styled.form`
+const AddBusFormOneStyled = styled.div`
 
     display: flex;
     flex-direction: column;

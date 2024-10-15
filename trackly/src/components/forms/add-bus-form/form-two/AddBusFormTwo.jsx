@@ -1,8 +1,8 @@
 import styled from "styled-components"
 
-import { useAddBusContext } from "../../../contexts/driver/AddBusContext";
+import { useAddBusContext } from "../../../../contexts/driver/AddBusContext";
 
-import Button from '../../button/Button'
+import Button from '../../../button/Button'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleChevronRight, faCircleChevronLeft } from "@fortawesome/free-solid-svg-icons";
@@ -15,7 +15,9 @@ const AddBusFormTwo = () => {
         formData,
         handleChange,
         prevStep,
-        nextStep
+        nextStep,
+        vehicleNumber,
+        setVehicleNumber
     } = useAddBusContext();
 
     return(
@@ -34,8 +36,8 @@ const AddBusFormTwo = () => {
                                 type="text"
                                 name="vehicleNumber"
                                 placeholder="Vehicle Number"
-                                value={formData.lastName}
-                                onChange={handleChange}
+                                value={vehicleNumber}
+                                onChange={e => setVehicleNumber(e.target.value)}
                             />
                         </label>
                     </div>
@@ -109,7 +111,7 @@ const AddBusFormTwo = () => {
     )
 }
 
-const AddBusFormTwoStyled = styled.form`
+const AddBusFormTwoStyled = styled.div`
 
     display: flex;
     flex-direction: column;

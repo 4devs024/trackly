@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { useAddBusContext } from "../../contexts/driver/AddBusContext";
 import ProgressBar from "../../components/styles/Progress";
+import { LocationSearchProvider } from "../../contexts/location/LocationSearchContext";
 
 const totalSteps = 3;
 
@@ -11,16 +12,18 @@ const AddBus = () => {
     } = useAddBusContext();
 
     return (
-        <AddBusStyled>
-            <div className="inner-layout">
-                <div className="progress-bar">
-                    <ProgressBar step={step} totalSteps={totalSteps} />
+        <LocationSearchProvider>
+            <AddBusStyled>
+                <div className="inner-layout">
+                    <div className="progress-bar">
+                        <ProgressBar step={step} totalSteps={totalSteps} />
+                    </div>
+                    <div className="form">
+                        {loadStep(step)}
+                    </div>
                 </div>
-                <div className="form">
-                    {loadStep(step)}
-                </div>
-            </div>
-        </AddBusStyled>
+            </AddBusStyled>
+        </LocationSearchProvider>
     );
 }
 
