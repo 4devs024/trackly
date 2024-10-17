@@ -23,3 +23,21 @@ export const postAPI = async ( url, data) => {
         throw {error: true, data: error};
     }
 }
+
+export const getOneAPI = async (url, busId) => {
+    try {
+        // Construct the URL with the busId as a path parameter
+        const fullUrl = `${url}/${busId}`;
+
+        const response = await axios.get(fullUrl, {
+            headers: {
+                Authorization: token, 
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        return response;
+    } catch (error) {
+        return error;
+    }
+};

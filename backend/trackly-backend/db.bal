@@ -67,77 +67,144 @@ isolated function getLastInsertId() returns int|error {
 }
 
 
-isolated function selectBus(string vehicleNumber) returns sql:Error|BusInput {
-    // Create a variable to hold the bus input
+isolated function selectBus(string vehicleNumber) returns sql:Error | BusInput | error {
+    // Initialize BusInput structure with default values
     BusInput busInput = { 
         firstName: "", 
         lastName: "", 
         phoneNumber: "", 
         vehicleNumber: vehicleNumber, 
-        route: {legs: [], bounds: {northeast: {lat: 0.0, lng: 0.0}, southwest: {lat: 0.0, lng: 0.0}}, waypointOrder: (), polyline: ""}, 
+        route: {
+            legs: [], 
+            bounds: {
+                northeast: {lat: 0.0, lng: 0.0}, 
+                southwest: {lat: 0.0, lng: 0.0}
+            }, 
+            waypointOrder: (), 
+            polyline: ""
+        }, 
         schedules: [
-                        {day: "monday", entries: []},
-                        {day: "tuesday", entries: []},
-                        {day: "wednesday", entries: []},
-                        {day: "thursday", entries: []},
-                        {day: "friday", entries: []},
-                        {day: "saturday", entries: []},
-                        {day: "sunday", entries: []}
-                    ] 
+            {day: "Monday", entries: []},
+            {day: "Tuesday", entries: []},
+            {day: "Wednesday", entries: []},
+            {day: "Thursday", entries: []},
+            {day: "Friday", entries: []},
+            {day: "Saturday", entries: []},
+            {day: "Sunday", entries: []}
+        ] 
     };
 
-    sql:ParameterizedQuery selectBusQuery = `SELECT first_name, last_name, phone_number FROM buses WHERE vehicle_number = ${vehicleNumber}`;
-    sql:ParameterizedQuery selectRouteQuery = `SELECT polyline, northeast_lat, northeast_lng, southwest_lat, southwest_lng FROM routes WHERE vehicle_number = ${vehicleNumber}`;
-    
-    // Get basic bus info
-    Bus|sql:Error busStream = dbClient->queryRow(selectBusQuery);
+    // SQL query to retrieve all data at once
+    sql:ParameterizedQuery selectBusDataQuery = `SELECT 
+        b.vehicle_number, b.first_name, b.last_name, b.phone_number,
+        r.polyline, r.northeast_lat, r.northeast_lng, r.southwest_lat, r.southwest_lng,
+        l.start_lat, l.start_lng, l.end_lat, l.end_lng, l.distance, l.duration,
+        s.day_of_week, s.departure_time, s.departure_place, s.arrival_time, s.arrival_place
+        FROM buses b
+        LEFT JOIN routes r ON b.vehicle_number = r.vehicle_number
+        LEFT JOIN legs l ON r.route_id = l.route_id
+        LEFT JOIN schedules s ON b.vehicle_number = s.vehicle_number
+        WHERE b.vehicle_number = ${vehicleNumber}`;
 
-    if busStream is Bus {
-        busInput.firstName = busStream.firstName;
-        busInput.lastName = busStream.lastName;
-        busInput.phoneNumber = busStream.phoneNumber;
-    } 
+    // Stream result from the query
+    stream<record {| 
+        string vehicle_number; 
+        string first_name; 
+        string last_name; 
+        string phone_number; 
+        string polyline; 
+        float northeast_lat; 
+        float northeast_lng; 
+        float southwest_lat; 
+        float southwest_lng; 
+        float? start_lat; 
+        float? start_lng; 
+        float? end_lat; 
+        float? end_lng; 
+        string? distance; 
+        string? duration; 
+        string? day_of_week; 
+        string? departure_time; 
+        string? departure_place; 
+        string? arrival_time; 
+        string? arrival_place; 
+    |}, error?> busStream = dbClient->query(selectBusDataQuery);
 
-    // Get route info
-    Route|sql:Error routeStream = dbClient->queryRow(selectRouteQuery);
+    // Process the results
+    check from var busRecord in busStream
+        do {
+            // Set bus details (only once)
+            if busInput.firstName == "" {
+                busInput.firstName = busRecord.first_name;
+                busInput.lastName = busRecord.last_name;
+                busInput.phoneNumber = busRecord.phone_number;
 
-    if routeStream is Route {
-        Route route = {
-            polyline: routeStream.polyline,
-            bounds: routeStream.bounds,
-            legs: routeStream.legs,
-            waypointOrder: routeStream.waypointOrder // Assuming legs will be filled later or are not needed in this query
+                // Set route information (also set once)
+                busInput.route.polyline = busRecord.polyline;
+                busInput.route.bounds.northeast = {
+                    lat: busRecord.northeast_lat,
+                    lng: busRecord.northeast_lng
+                };
+                busInput.route.bounds.southwest = {
+                    lat: busRecord.southwest_lat,
+                    lng: busRecord.southwest_lng
+                };
+            }
+
+            // Process leg information (optional)
+            if busRecord.start_lat is float && busRecord.start_lng is float && busRecord.end_lat is float && busRecord.end_lng is float {
+                Leg leg = {
+                    start_location: {lat: busRecord.start_lat, lng: busRecord.start_lng},
+                    end_location: {lat: busRecord.end_lat, lng: busRecord.end_lng},
+                    distance: busRecord.distance ?: "0.0",
+                    duration: busRecord.duration ?: "0.0"
+                };
+                busInput.route.legs.push(leg);
+            }
+
+            // Process schedule information (optional)
+            if busRecord.day_of_week is string && busRecord.departure_time is string && busRecord.arrival_time is string {
+                ScheduleEntry entry = {
+                    departureTime: busRecord.departure_time ?: "",
+                    departurePlace: busRecord.departure_place ?: "",
+                    arrivalTime: busRecord.arrival_time ?: "",
+                    arrivalPlace: busRecord.arrival_place ?: ""
+                };
+
+                // Add entry to the corresponding day in schedules
+                foreach var schedule in busInput.schedules {
+                    if schedule.day == busRecord.day_of_week {
+                        // Check if the entry already exists to prevent duplication
+                        boolean entryExists = false;
+                        foreach var existingEntry in schedule.entries {
+                            if existingEntry.departureTime == entry.departureTime && 
+                            existingEntry.arrivalTime == entry.arrivalTime &&
+                            existingEntry.departurePlace == entry.departurePlace &&
+                            existingEntry.arrivalPlace == entry.arrivalPlace {
+                                entryExists = true;
+                                break;
+                            }
+                        }
+                        if !entryExists {
+                            // Add the entry if it doesn't already exist
+                            schedule.entries.push(entry);
+                        }
+                        break;
+                    }
+                }            
+            }
         };
 
-        busInput.route = route;
-    }
+    // Close the stream after processing
+    check busStream.close();
 
-    // Get schedule info
-    sql:ParameterizedQuery selectScheduleQuery = `SELECT day_of_week, departure_time, departure_place, arrival_time, arrival_place FROM schedules WHERE vehicle_number = ${vehicleNumber}`;
-    stream<ScheduleEntry, error?> scheduleStream = dbClient->query(selectScheduleQuery);
-
-    // Iterate through the schedule stream and update busInput.schedules
-    while (scheduleStream.next() !== null) {
-        record {|ScheduleEntry value;|}|error? entry = scheduleStream.next();
-        if entry is ScheduleEntry {
-            // Find the correct schedule day and append the entry
-            foreach var schedule in busInput.schedules {
-                if schedule.day == entry.day_of_week {
-                    schedule.entries.push({
-                        departureTime: entry.departure_time,
-                        departurePlace: entry.departure_place,
-                        arrivalTime: entry.arrival_time,
-                        arrivalPlace: entry.arrival_place
-                    });
-                }
-            }
-        } if entry is error {
-            return sql:NoRowsError;
-        }
-    }
-
+    // Return the populated BusInput structure
     return busInput;
 }
+
+
+
+
 
 // isolated function selectAllOrders() returns Order[]|error {
 //     sql:ParameterizedQuery selectQuery = `SELECT * FROM Orders`;
@@ -155,3 +222,5 @@ isolated function selectBus(string vehicleNumber) returns sql:Error|BusInput {
 //     sql:ParameterizedQuery selectQuery = `SELECT latitude, longitude FROM locations ORDER BY RAND() LIMIT 1`;
 //     return dbClient->queryRow(selectQuery);
 // }
+
+
