@@ -13,7 +13,7 @@ import { useScheduleContext } from "../../../contexts/schedule/ScheduleContext";
 export default function DepartureDestinationForm() {
 
     const { startPosition, endPosition, directionsService } = useLocationSearchContext();
-    const { setRefferences } = useScheduleContext();
+    const { setReferences } = useScheduleContext();
 
 
     const handleSubmit = e => {
@@ -46,7 +46,7 @@ export default function DepartureDestinationForm() {
                 bRad='20px'
                 color='white'
                 height='40px'
-                onClick={() => setRefferences(startPosition, endPosition, directionsService)}
+                onClick={() => setReferences(startPosition, endPosition, directionsService)}
             />
         </DepartureDestinationFormStyled>
     )

@@ -9,9 +9,9 @@ import ballerina/sql;
 }
 
 service on new http:Listener(9091) {
-    // isolated resource function get orders() returns Order[]|error {
-    //     return selectAllOrders();
-    // };
+    isolated resource function get buses() returns BusInput[]|error {
+        return selectBuses();
+    };
 
     isolated resource function get buses/[string id]() returns BusInput|http:InternalServerError|http:NotFound|error {
         sql:Error|BusInput entry = check selectBus(id);
@@ -35,6 +35,10 @@ service on new http:Listener(9091) {
         }
         return http:INTERNAL_SERVER_ERROR;
     };
+
+    // isolated resource function post schedules(http:Caller caller, http:Request req) returns error?{
+    //     check getSchedules(caller, req);
+    // }
 }
 
 

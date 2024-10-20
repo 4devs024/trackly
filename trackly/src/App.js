@@ -12,18 +12,10 @@ import Profile from './pages/profile/Profile';
 
 import { PanelControlProvider } from './contexts/global/PanelControlContext';
 import { AddBusProvider } from './contexts/driver/AddBusContext'
-import { useEffect } from 'react';
 
-import { getBusData, getBusesData } from './api/BusCRUD';
 
 
 function App() {
-
-  useEffect(() => {
-    console.log(getBusData());
-  }, [])
-  
-  
   return (
     <BrowserRouter>
         <Routes>

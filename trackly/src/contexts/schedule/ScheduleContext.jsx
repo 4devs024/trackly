@@ -1,163 +1,153 @@
-import { createContext, useContext, useRef, useState, useCallback, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
+import { getBusesData } from "../../api/BusCRUD";
+import { calculateNearestPoint } from "../../important-functions/ScheduleSelection";
+
+import nearestPointOnLine from '@turf/nearest-point-on-line';
+import { lineString, point } from '@turf/turf'; // Assuming you have this for creating line strings
+import polyline from '@mapbox/polyline';
+
 
 const ScheduleContext = createContext();
 
 export const useScheduleContext = () => useContext(ScheduleContext);
 
 export const ScheduleProvider = ({ children }) => {
-    const [schedules, setSchedules] = useState([]);
+    const [schedule, setSchedule] = useState(null);
     const [startPosition, setStartPosition] = useState(null);
     const [endPosition, setEndPosition] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [estimatedArrivalTime, setEstimatedArrivalTime] = useState(null);
+    const [busData, setBusData] = useState(null);
+    const [selectedBus, setSelectedBus] = useState(null);
+    const [selectedTrip, setSelectedTrip] = useState(null);
+    const [routeDepartureLocationName, setRouteDepartureLocationName] = useState("");
+    const [routeArrivalLocationName, setRouteArrivalLocationName]  = useState("");
+
+
     const directionsService = useRef(null);
 
-    const setRefferences = (start, end, dirService) => {
+    const setReferences = (start, end, dirService) => {
         setStartPosition(start);
         setEndPosition(end);
         directionsService.current = dirService.current;
     };
 
-    const filterOnlyBusRoutes = (result) => {
-        const filteredRoutes = result.routes.filter(route =>
-            route.legs.every(leg =>
-                leg.steps.every(step =>
-                    step.travel_mode !== 'TRANSIT' || (step.travel_mode === 'TRANSIT' && step.transit.line.vehicle.type === 'BUS')
-                )
-            )
-        );
-        return { ...result, routes: filteredRoutes };
+    const isBusGoingForward = (busDeparturePlace, busArrivalPlace) => {
+        return (busDeparturePlace == routeDepartureLocationName && busArrivalPlace == routeArrivalLocationName);
+    }
+
+    const isPassengerGoingForward = (bus, startPosition, endPosition) => {
+        // Decode the bus route polyline
+        const decodedPolyline = polyline.decode(bus.route.polyline);
+        const busRouteLine = lineString(decodedPolyline.map(([lat, lng]) => [lng, lat])); // Turf.js expects [lng, lat]
+    
+        // Find the nearest points on the bus route line
+        const startPoint = point([startPosition.lng, startPosition.lat]);
+        const endPoint = point([endPosition.lng, endPosition.lat]);
+    
+        const nearestStart = nearestPointOnLine(busRouteLine, startPoint);
+        const nearestEnd = nearestPointOnLine(busRouteLine, endPoint);
+    
+        // Get the index of the nearest points
+        const startIndex = nearestStart.properties.index;
+        const endIndex = nearestEnd.properties.index;
+    
+        // Check if the passenger's start position is before and the end position is after
+        return startIndex < endIndex;
     };
-
-    const getTransitSchedulesWithinTwoHours = useCallback(async () => {
-        if (!startPosition || !endPosition || !directionsService.current) {
-            console.error("Start or end position not defined, or directions service not initialized");
-            return;
+    
+    
+    // Function to find the relevant trip based on selected bus and current time
+    const findRelevantTrip = () => {
+        if (!selectedBus || !selectedBus.schedules) return null;
+    
+        const currentTime = new Date();
+        currentTime.setHours(7); // Example time for testing
+        currentTime.setMinutes(25);
+    
+        const currentDay = currentTime.toLocaleString('en-US', { weekday: 'long' });
+    
+        // Find the schedule for the current day
+        const todaySchedule = selectedBus.schedules.find(schedule => schedule.day === currentDay);
+    
+        if (!todaySchedule || todaySchedule.entries.length === 0) {
+            console.error('No schedule entries available for today');
+            return null;
         }
+    
+        // Find the next trip based on current time and direction
+        const nextTrip = todaySchedule.entries.find(entry => {
+            const departureTime = new Date(currentTime.toDateString() + ' ' + entry.departureTime);
+            const arrivalTime = new Date(currentTime.toDateString() + ' ' + entry.arrivalTime);
 
-        const schedules = [];
-        const now = new Date();
-        const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-        const interval = 15 * 60 * 1000; // 15 minutes in milliseconds
+            const departurePlace = entry.departurePlace
+            const arrivalPlace = entry.arrivalPlace;
+            
+            const busGoesFoward = isBusGoingForward(departurePlace, arrivalPlace);
+            const passengerGoesFoward = isPassengerGoingForward(selectedBus, startPosition, endPosition);
 
-        const getSchedules = async (time) => {
-            return new Promise((resolve, reject) => {
-                const request = {
-                    origin: startPosition,
-                    destination: endPosition,
-                    travelMode: window.google.maps.TravelMode.TRANSIT,
-                    transitOptions: {
-                        routingPreference: 'FEWER_TRANSFERS',
-                        departureTime: new Date(time)
-                    }
-                };
 
-                directionsService.current.route(request, (result, status) => {
-                    if (status === window.google.maps.DirectionsStatus.OK) {
-                        const filteredResult = filterOnlyBusRoutes(result);
-                        console.log(filteredResult)
-                        resolve(filteredResult);
-                    } else {
-                        reject(`Error fetching directions: ${status}`);
-                    }
-                });
-            });
+            if(passengerGoesFoward){
+                if(busGoesFoward){
+                    return departureTime > currentTime;
+                }
+            } else {
+                if(!busGoesFoward){
+                    return departureTime > currentTime;
+                }
+            }
+        });
+    
+        if (!nextTrip) {
+            console.error('No upcoming trips found for selected bus in the correct direction');
+            return null;
+        }
+    
+        setSelectedTrip(nextTrip); // Store the selected trip
+        return nextTrip;
+    };
+    
+    useEffect(() => {
+        const fetchBusData = async () => {
+            setLoading(true);
+            try {
+                const response = await getBusesData();
+                setBusData(response.data);
+            } catch (error) {
+                console.error('Error fetching bus data:', error);
+            } finally {
+                setLoading(false);
+            }
         };
 
-        const promises = [];
-        for (let time = now.getTime(); time <= twoHoursLater.getTime(); time += interval) {
-            promises.push(getSchedules(time));
-        }
-
-        Promise.all(promises).then(results => {
-            results.forEach(result => {
-                schedules.push(...result.routes);
-            });
-            setSchedules(schedules);
-        }).catch(error => {
-            console.error(error);
-        });
-    }, [startPosition, endPosition]);
+        fetchBusData();
+    }, []);
 
     useEffect(() => {
-        if (startPosition && endPosition) {
-            getTransitSchedulesWithinTwoHours();
+        if (startPosition && endPosition && busData) {
+            const nearestBus = calculateNearestPoint(startPosition, endPosition, busData);
+            busData.forEach(bus => {
+                if (bus.vehicleNumber === nearestBus) {
+                    setSelectedBus(bus);
+                    setRouteDepartureLocationName(bus.schedules[0].entries[0].departurePlace)
+                    setRouteArrivalLocationName(bus.schedules[0].entries[0].arrivalPlace)
+                }
+            });
         }
-    }, [startPosition, endPosition, getTransitSchedulesWithinTwoHours]);
+    }, [startPosition, endPosition, busData]);
+
+    useEffect(() => {
+        if (selectedBus) {
+            const relevantTrip = findRelevantTrip(); // Find the relevant trip
+            if (relevantTrip) {
+                setSchedule(relevantTrip);
+            }
+        }
+    }, [selectedBus]);
 
     return (
-        <ScheduleContext.Provider value={{ setRefferences, schedules }}>
+        <ScheduleContext.Provider value={{ setReferences, schedule, loading, estimatedArrivalTime, busData, selectedBus, selectedTrip }}>
             {children}
         </ScheduleContext.Provider>
     );
 };
-
-
-//////////////////////////////////////
-
-// import { createContext, useContext, useState } from "react";
-
-
-// const ScheduleContext = createContext();
-
-// export const useScheduleContext = () => useContext(ScheduleContext);
-
-
-// export const ScheduleProvider = ({children}) => {
-
-//   // This useState is used manage the schedules
-//   const [transitDirections, setTransitDirections] = useState(null);
-
-
-
-
-
-
-
-//   const getTransitDirections = async (origin, destination, directionsService) => {
-//     if (!directionsService.current) {
-//       directionsService.current = new window.google.maps.DirectionsService();
-//     }
-
-//     const request = {
-//       origin,
-//       destination,
-//       travelMode: window.google.maps.TravelMode.TRANSIT,
-//       transitOptions: {
-//         routingPreference: 'FEWER_TRANSFERS',
-//         departureTime: new Date(), 
-//       },
-//     };
-
-//     directionsService.current.route(request, (result, status) => {
-//       if (status === window.google.maps.DirectionsStatus.OK) {
-//         const filteredResult = filterOnlyBusRoutes(result);
-//         setTransitDirections(filteredResult);
-//         console.log(result);
-//       } else {
-//         console.error('Error fetching directions:', status);
-//       }
-//     });
-//   };
-
-//   const filterOnlyBusRoutes = (result) => {
-//     result.routes.forEach(route => {
-//       route.legs.forEach(leg => {
-//         leg.steps = leg.steps.filter(step => step.travel_mode !== 'TRANSIT' || (step.travel_mode === 'TRANSIT' && step.transit.line.vehicle.type === 'BUS'));
-//       });
-//     });
-//     return result;
-//   };
-
-
-
-//   return(
-//     <ScheduleContext.Provider 
-//       value={{
-//         getTransitDirections,
-//         transitDirections
-//       }}>
-//       {children}
-//     </ScheduleContext.Provider>
-//   );
-
-
-// }

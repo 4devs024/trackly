@@ -4,12 +4,14 @@ import styled from 'styled-components';
 import TopNav from '../../components/top-nav/TopNav';
 import ResultBar from '../../components/search-result/ResultBar';
 import MapComponent from '../../components/map/MapComponent';
+import RealTimeTrackingMap from '../../components/map/real-time-tracking/RealTimeTrackingMap';
 import ProfileImg from '../../components/top-nav/ProfileImg';
 import Tabs from '../../components/top-nav/Tabs';
 import SideNav from '../../components/side-nav/SideNav';
 
 import { LocationSearchProvider } from '../../contexts/location/LocationSearchContext';
 import { ScheduleProvider } from '../../contexts/schedule/ScheduleContext';
+
 
 import { usePanelControlContext } from '../../contexts/global/PanelControlContext';
 
@@ -19,7 +21,8 @@ export default function Home() {
 
     const {
         showResultBar,
-        isScheduleAsked
+        isScheduleAsked,
+        isRealTimeMapAsked
     } = usePanelControlContext();
 
     return (
@@ -28,7 +31,8 @@ export default function Home() {
                 <SideNav />
                 <div className="main-content">
                     {!isScheduleAsked && <div className="nav-bar"><TopNav /></div>}
-                    <div className="map-container"><MapComponent /></div>
+                    {isRealTimeMapAsked && <div className="map-container"><RealTimeTrackingMap /></div>}
+                    {!isRealTimeMapAsked && <div className="map-container"><MapComponent /></div>}
                     {
                         showResultBar && 
                         <div className="result-container">

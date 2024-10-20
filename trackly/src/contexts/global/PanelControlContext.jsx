@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 
 const PanelControlContext = createContext();
@@ -19,6 +19,8 @@ export const PanelControlProvider = ({children}) => {
     const [isTopNavVisible, setIsTopNavVisible] = useState(true); 
     // This is used to load the bus schedule layer on top of result content bar
     const [isScheduleAsked, setIsScheduleAsked] = useState(false);
+    // This is used to show the real time tracking map information when passenger selects a schedule
+    const [isRealTimeMapAsked, setIsRealTimeMapAsked] = useState(false);
 
     // This function is used to give the toggle effect to the result bar
     const toggleResultSidebar = () => {
@@ -41,8 +43,6 @@ export const PanelControlProvider = ({children}) => {
         setIsTopNavVisible(!val);
     }
 
-
-
     return(
         <PanelControlContext.Provider value={{
             isResultOpen,
@@ -58,7 +58,9 @@ export const PanelControlProvider = ({children}) => {
             setIsTopNavVisible,
             isScheduleAsked,
             setIsScheduleAsked,
-            setScheduleVisibility
+            setScheduleVisibility,
+            isRealTimeMapAsked,
+            setIsRealTimeMapAsked
         }}>
             {children}
         </PanelControlContext.Provider>
