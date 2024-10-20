@@ -1,0 +1,11 @@
+host = "database-1.cnuoaou0q1vt.eu-north-1.rds.amazonaws.com"
+port = 3306
+user = "admin"
+database = "trackly"
+password = "ViduSql1234;"
+googleApiKey = "AIzaSyAOEatSLRac4OG2bfIySYe6l8aV61Fm_rc"
+connectionOptions = {}
+
+
+
+
